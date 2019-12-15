@@ -499,6 +499,7 @@ void windowProgress2(){
 
 
 }
+void zwmsb();
 int main() {
 	full_screen();
 	system("color 70");		//ÉèÖÃ±³¾°£¬×ÖÑÕÉ« 
