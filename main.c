@@ -9,7 +9,9 @@
 #define	 BlockWidth 10	//一个Block宽度为10
 #define	 BlockHeigh 12	//一个Block高度为12
 
-
+void  windowProgress();
+void windowProgress2();
+void rollBlock(int x, int y);
 /**
 定位坐标
 */
@@ -79,7 +81,40 @@ void createLine()
 	printf("\n");
 
 }
+/*
+模式2边框
+*/
+void createLine2()
+{
+	int i, j;
+	for (i = 0; i < MaxHeigh; i++)	//左右边框+中间
+	{
+		gotoxy(0, i);
+		printf("□");
+		gotoxy((MaxWidth) / 4, i);
+		printf("□");
+		gotoxy((MaxWidth) / 4 * 2, i);
+		printf("□");
+		gotoxy((MaxWidth) / 4 * 3, i);
+		printf("□");
+		gotoxy(MaxWidth, i);
+		printf("□");
+		printf("%d", i);						//行数标识
+	}
+	printf("\n");
 
+	for (j = 2; j <= MaxWidth; j += 2)	//上下边框+中间边框
+	{
+		gotoxy(j, 0);
+		printf("□");
+		
+		gotoxy(j, MaxHeigh - 1);
+		printf("□");
+
+	}
+	printf("\n");
+
+}
 /**
 设置颜色
 */
@@ -102,9 +137,56 @@ void  paintBlock(int x, int y) {
 		}
 	}
 	gotoxy(0, 52);
+}
+	/**
+	生成方块2
+	*/
+void  paintBlock2(int x){
+	int  i,j;
+	int haspaint = 0;
+	int  rx = (x * BlockWidth + x + 1) * 2;//加上线和前面的块才是真正的x坐标，并且一个方块（线）占两个字符
+	//int  ry = y * BlockHeigh + y + 1;	
+	for (j = 1; j <= 12; j++) {
+		Sleep(500);
+		for (i = rx; i <= rx + BlockWidth * 2 - 1; i = i + 2)
+			{
+		
+				gotoxy(i, j);
+				printf("■");
+				haspaint++;
+				
+			}
+	}	
+	
+	rollBlock(x,j);//x是水平距离，y是底部方块所在的行数j=12
+	gotoxy(0, 52);
 
 }
+/*
+模式2的方块下落方式
+*/
+void rollBlock(int x, int y) {	//y=12
+	int i;
+	int  rx = (x * BlockWidth + x + 1) * 2;//加上线和前面的块才是真正的x坐标，并且一个方块（线）占两个字符
+	int top = 1,bottom=y;
 
+	while (bottom <= 51)
+	{	
+		Sleep(500);
+		for (i = rx; i <= rx + BlockWidth * 2 - 1; i = i + 2)
+			{
+				gotoxy(i, top);
+				printf("  ");
+				
+				gotoxy(i, bottom);
+				printf("■");
+				
+			}
+		top++; bottom++;
+	}
+			
+		
+}
 /**
 随机产生方块
 */
@@ -116,7 +198,33 @@ void  randCreateBlock(int bblock[]) {
 
 		bblock[i] = rand() % 4;
 		paintBlock(bblock[i], i);
+		
 	}
+
+}
+
+/**
+随机产生方块2
+*/
+void  randCreateBlock2(int bblock[]) {
+
+	int i;
+	//int haspaint = 0;
+	//while (1)
+	//{
+	//	Sleep(1000);
+	///*for (i = 0; i < 5; i++)
+	//	{	
+	//	
+	//		bblock[i] = rand() % 4;
+	//	
+	//		paintBlock2(bblock[i]);
+	//		
+	//	}*/
+	//	
+	//}
+	bblock[0] = rand() % 4;
+	paintBlock2(bblock[0]);
 }
 
 /**
@@ -149,18 +257,17 @@ void listenKeyBoard() {
 		char ch = _getch();
 		printf("%c", ch);
 		printf("%d", ch);
-
 	}
 }
 
 /**
 读取最高分数
 */
-int readmaxScore() {
-	int maxScore;
+double readmaxScore() {
+	double maxScore;
 	FILE* fp;
-	fopen_s(&fp, "score.txt", "r+");//r+读写 ，如果不存在就创建
-	fscanf_s(fp, "%d", &maxScore);
+	fopen_s(&fp, "score.txt", "r");//r+读写 ，如果不存在就创建
+	fscanf_s(fp, "%lf", &maxScore);
 	fclose(fp);
 	return maxScore;
 }
@@ -169,7 +276,7 @@ int readmaxScore() {
 绘制分数框
 */
 
-void paintScoreBox(int score) {					//分数
+void paintScoreBox(double time) {					//分数
 
 
 	int heigh = 15, width = 60;
@@ -191,9 +298,9 @@ void paintScoreBox(int score) {					//分数
 		printf("☆");
 	}
 	gotoxy(125, 28);
-	printf("YOUR SCORE:%d", score);	//显示当前分数
+	printf("您的用时:%.4f",time);	//显示当前分数
 	gotoxy(125, 25);
-	printf("最高分:%d", readmaxScore());	//显示最高分数
+	printf("最短用时:%.4f", readmaxScore());	//显示最高分数
 	gotoxy(0, 53);
 	//printf("%f", duration);
 }
@@ -201,11 +308,11 @@ void paintScoreBox(int score) {					//分数
 /**
 保存最高分进文件
 */
-void storeScore(int score)
+void storeScore(double score)
 {
 	FILE* fp;
-	fopen_s(&fp, "score.txt", "r+");//w+读写 ，如果不存在就创建
-	fprintf(fp, "%d\n", score);
+	fopen_s(&fp, "score.txt", "w");//w写 ，如果不存在就创建
+	fprintf(fp, "%lf\n", score);
 	fclose(fp);
 }
 /**
@@ -240,6 +347,12 @@ void welcome() {
 		printf("请选择[1,2,3]:[ ]\b\b");
 		scanf_s("%d", &n);
 		switch (n) {
+		case 0:
+			system("cls");
+			createLine2();
+			windowProgress2();
+			flag = 0;
+			break;
 		case 1:
 			system("cls");
 			createLine();
@@ -275,13 +388,35 @@ void welcome() {
 
 }
 
+void rePlay() {
+	int n;
+	printf("重新开始游戏按“1”，结束游戏按“2”,返回主菜单按“3”！\n\n");
+	scanf_s("%d", &n);
+	switch (n) {
+	case 1:
+		system("cls");
+		createLine();
+		windowProgress();
+		break;
+	case 2:
+		exit(0);
+		break;
+	case 3:
+		system("cls");
+		welcome();
+		break;
+	default:
+		printf("输入有误");
+		break;
+	}
+}
 /**
 窗口处理		1.清除痕迹 2.交换数据 3.重新绘制块 4.按键下移
 */
 void  windowProgress() {
-	int i, j;	//方块位置向下
+	int i, j;							//方块位置向下
 	int tmp;
-	int score = 0;
+	int score = 0;						//分数
 	int key[4] = { 100,102,106,107 };
 	int  bblock[4];						//四个黑块的位置
 
@@ -289,16 +424,34 @@ void  windowProgress() {
 	srand((unsigned int)time(NULL));    //时间种子，设置随机数用的	
 
 	randCreateBlock(bblock);			//产生块
-	clock_t start, first, finish;
+	clock_t start,finish=0;
+	double time;
 
-
+	paintScoreBox(0);
 	while (1)
 	{
-		paintScoreBox(score);
+		
 		tmp = bblock[3];
 		if (_getch() == key[tmp])
 		{
 			score++;
+			if (score == 1){
+				start = clock();
+			}
+			if (score == 5) {
+				finish = clock();
+				time = (double)(finish - start) / CLK_TCK;
+				gotoxy(0, 53);
+			
+				if (time < readmaxScore())
+				{
+					printf("恭喜你创新纪录了！\n");
+					storeScore(time);									
+				}
+				printf("%f", time);
+				paintScoreBox(time);
+				break;
+			}
 			for (j = 0; j < 4; j++)
 			{
 				cleanBlock(bblock[j], j);		//清除痕迹
@@ -317,40 +470,35 @@ void  windowProgress() {
 			gotoxy(0, 53);
 		}
 		else
-		{
-			if (score > readmaxScore())
-			{
-				printf("恭喜你创新纪录了！\n");
-				storeScore(score);
-			}
-			else
-			{
-				printf("叫你别踩白块啦！！\n\n");
-			}
-			int n;
-			printf("重新开始游戏按“1”，结束游戏按“2”,返回主菜单按“3”！\n\n");
-			scanf_s("%d", &n);
-			switch (n) {
-			case 1:
-				system("cls");
-				createLine();
-				windowProgress();
-				break;
-			case 2:
-				exit(0);
-				break;
-			case 3:
-				system("cls");
-				welcome();
-				break;
-			default:
-				break;
-			}
+		{	int n;
+			printf("叫你别踩白块啦！！\n\n");		
+			rePlay();
 		}
 	}
+	rePlay();
+
+
 }
 
 
+/*
+窗口处理2（模式2） 
+*/
+void windowProgress2(){
+	int i, j;							//方块位置向下
+	int tmp;
+	int score = 0;						//分数
+	int key[4] = { 100,102,106,107 };
+	int  bblock[5];						//四个黑块的位置
+
+
+	srand((unsigned int)time(NULL));    //时间种子，设置随机数用的	
+
+	randCreateBlock2(bblock);			//产生块
+
+
+
+}
 int main() {
 	full_screen();
 	system("color 70");		//设置背景，字颜色 
