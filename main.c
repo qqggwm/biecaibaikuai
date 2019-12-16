@@ -320,8 +320,9 @@ void storeScore(double score)
 */
 void welcome() {
 	//system("cls");
-	int n, flag = 1;
+	int n, m, flag = 1;
 	int i, j = 1;
+	int k = 1;
 	while (flag == 1) {
 		gotoxy(43, 18);
 		printf("别 踩 白 块");
@@ -354,15 +355,74 @@ void welcome() {
 			flag = 0;
 			break;
 		case 1:
+			/*
+			模式界面选择
+			*/
+			while (k==1) {
 			system("cls");
-			createLine();
-			windowProgress();
+				//printf("")
+				for (i = 20; i <= 26; i++)
+				{
+					for (j = 27; j <= 74; j++)
+					{
+						gotoxy(j, i);
+						if (i == 20 || i == 26)
+							printf("-");
+						else if (j == 27 || j == 74)
+							printf("|");
+					}
+				}
+					gotoxy(43, 18);
+					printf("模式选择");
+					gotoxy(35, 22);
+					printf("1.时间模式");
+					gotoxy(50, 22);
+					printf("2.无尽模式");
+					gotoxy(35, 25);
+					printf("3.返回主菜单");
+					gotoxy(29, 27);
+					printf("请选择[1,2,3]:[ ]\b\b");
+					scanf_s("%d", &m);
+			
+					switch (m)
+					{
+						case 1:
+							system("cls");
+							createLine();
+							windowProgress();
+							k = 0;
+							break;
+						case 2:
+							system("cls");
+							createLine2();
+							windowProgress2();
+							k = 0;
+							break;
+						case 3:
+							welcome();
+							break;
+						default:
+							gotoxy(30, 30);
+							printf("输入数据不符合条件");
+							gotoxy(35, 35);
+							printf("	输入任意键退出!   ");
+							if (_getch()) {
+								system("cls");
+								break;
+							}
+
+					}
+			}
 			flag = 0;
 			break;
 		case 2:
 			gotoxy(30, 30);
 			printf("从左到右依次对应四个键位:D F J K \n");
-			gotoxy(35, 35);
+			gotoxy(30, 33);
+			printf("游戏模式分两种:\n");
+			gotoxy(30, 34);
+			printf("1.冲刺模式：完成一定数量后得出时间作为成绩。2.无尽模式：不限时间以数量作为成绩。");
+			gotoxy(35, 40);
 			printf("输入任意键退出");
 			if (_getch()) {
 				system("cls");
@@ -499,7 +559,7 @@ void windowProgress2(){
 
 
 }
-void zwmsb();
+
 int main() {
 	full_screen();
 	system("color 70");		//设置背景，字颜色 
