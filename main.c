@@ -11,7 +11,7 @@
 
 void  windowProgress();
 void windowProgress2();
-void rollBlock(int x, int y);
+
 /**
 定位坐标
 */
@@ -39,8 +39,6 @@ void full_screen()
 
 	SetWindowPos(hwnd, HWND_TOP, 0, 0, cx, cy, 0);
 }
-
-
 
 /**
 画边框
@@ -81,6 +79,7 @@ void createLine()
 	printf("\n");
 
 }
+
 /*
 模式2边框
 */
@@ -138,54 +137,58 @@ void  paintBlock(int x, int y) {
 	}
 	gotoxy(0, 52);
 }
-	/**
-	生成方块2
-	*/
+
+/**
+生成方块2
+*/
 void  paintBlock2(int x){
 	int  i,j;
-	int haspaint = 0;
 	int  rx = (x * BlockWidth + x + 1) * 2;//加上线和前面的块才是真正的x坐标，并且一个方块（线）占两个字符
 	//int  ry = y * BlockHeigh + y + 1;	
-	for (j = 1; j <= 12; j++) {
-		Sleep(500);
-		for (i = rx; i <= rx + BlockWidth * 2 - 1; i = i + 2)
+	int speed = 200;
+	for (j = 1; j <= 12; j++) 
+	{
+		Sleep(speed);
+		for (i = rx; i <= rx + BlockWidth * 2 - 1; i = i + 2)	//第一阶段由无到有
 			{
 		
 				gotoxy(i, j);
-				printf("■");
-				haspaint++;
-				
+				printf("■");	
 			}
 	}	
-	
-	rollBlock(x,j);//x是水平距离，y是底部方块所在的行数j=12
-	gotoxy(0, 52);
+	int top = 1, bottom = j;	//辅助定位，块顶部，底部所在的位置
+	while (top <= 51)
+	{
 
-}
-/*
-模式2的方块下落方式
-*/
-void rollBlock(int x, int y) {	//y=12
-	int i;
-	int  rx = (x * BlockWidth + x + 1) * 2;//加上线和前面的块才是真正的x坐标，并且一个方块（线）占两个字符
-	int top = 1,bottom=y;
-
-	while (bottom <= 51)
-	{	
-		Sleep(500);
-		for (i = rx; i <= rx + BlockWidth * 2 - 1; i = i + 2)
+		Sleep(speed);
+		if (bottom <= 51) {
+			for (i = rx; i <= rx + BlockWidth * 2 - 1; i = i + 2)		//第二阶段由完整块到底部触底
 			{
 				gotoxy(i, top);
 				printf("  ");
-				
+
 				gotoxy(i, bottom);
 				printf("■");
-				
+
 			}
+		}
+		else
+		{
+			for (i = rx; i <= rx + BlockWidth * 2 - 1; i = i + 2)		//第三阶段由完整块底部触底到消失
+			{
+				gotoxy(i, top);
+				printf("  ");
+			}
+		}
 		top++; bottom++;
+		if (top == 2)
+		{
+			int x = rand() % 4;
+			paintBlock2(x);
+		}
 	}
-			
-		
+	gotoxy(0, 52);
+
 }
 /**
 随机产生方块
@@ -206,25 +209,21 @@ void  randCreateBlock(int bblock[]) {
 /**
 随机产生方块2
 */
-void  randCreateBlock2(int bblock[]) {
+void  randCreateBlock2() {
 
-	int i;
-	//int haspaint = 0;
-	//while (1)
-	//{
-	//	Sleep(1000);
-	///*for (i = 0; i < 5; i++)
-	//	{	
-	//	
-	//		bblock[i] = rand() % 4;
-	//	
-	//		paintBlock2(bblock[i]);
-	//		
-	//	}*/
-	//	
-	//}
-	bblock[0] = rand() % 4;
-	paintBlock2(bblock[0]);
+	int i,x;
+	int haspaint = 0;
+	while (1)
+	{
+		//Sleep(1000);		
+		x = rand() % 4;	
+		paintBlock2(x);
+			
+
+		
+	}
+	//bblock[0] = rand() % 4;
+	//paintBlock2(bblock[0]);
 }
 
 /**
@@ -482,24 +481,24 @@ void  windowProgress() {
 
 
 /*
-窗口处理2（模式2） 
+窗口处理2（模式2） 	
 */
 void windowProgress2(){
 	int i, j;							//方块位置向下
 	int tmp;
 	int score = 0;						//分数
 	int key[4] = { 100,102,106,107 };
-	int  bblock[5];						//四个黑块的位置
+	int  bblock=0;						//四个黑块的位置
 
 
 	srand((unsigned int)time(NULL));    //时间种子，设置随机数用的	
 
-	randCreateBlock2(bblock);			//产生块
+	randCreateBlock2();			//产生块
 
 
 
 }
-void zwmsb();
+
 int main() {
 	full_screen();
 	system("color 70");		//设置背景，字颜色 
