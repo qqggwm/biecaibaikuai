@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <time.h>
+#include <math.h>
 
 #define  MaxHeigh 53		//5+12*4
 #define  MaxWidth 88		//(10*4+5)*2
@@ -11,6 +12,18 @@
 
 void  windowProgress();
 void windowProgress2();
+
+/**
+定义隐藏光标函数
+*/
+void HideCursor()
+{
+	CONSOLE_CURSOR_INFO cursor;
+	cursor.bVisible = FALSE;
+	cursor.dwSize = sizeof(cursor);
+	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleCursorInfo(handle, &cursor);
+}
 
 /**
 定位坐标
@@ -137,7 +150,25 @@ void  paintBlock(int x, int y) {
 	}
 	gotoxy(0, 52);
 }
+/**
+生成方块1
+*/
+void  paintBlock1(int x, int y) {
+	int  i, j;
+	int  rx = (x * BlockWidth + x + 1) * 2;//加上线和前面的块才是真正的x坐标，并且一个方块（线）占两个字符
+	int  ry = y * 6 + y + 1;
 
+	for (j = ry; j <= ry + 6 - 1; j++)
+	{
+		for (i = rx; i <= rx + BlockWidth * 2 - 1; i = i + 2)
+		{
+
+			gotoxy(i, j);
+			printf("■");
+		}
+	}
+	gotoxy(0, 52);
+}
 /**
 生成方块2
 */
@@ -145,7 +176,7 @@ void  paintBlock2(int x){
 	int  i,j;
 	int  rx = (x * BlockWidth + x + 1) * 2;//加上线和前面的块才是真正的x坐标，并且一个方块（线）占两个字符
 	//int  ry = y * BlockHeigh + y + 1;	
-	int speed = 200;
+	int speed =100;
 	for (j = 1; j <= 12; j++) 
 	{
 		Sleep(speed);
@@ -181,10 +212,20 @@ void  paintBlock2(int x){
 			}
 		}
 		top++; bottom++;
-		if (top == 2)
+		if (top >= 2)
 		{
 			int x = rand() % 4;
-			paintBlock2(x);
+			rx = (x * BlockWidth + x + 1) * 2;
+			for (j=1; j <= 12; j++)
+			{
+				Sleep(speed);
+				for (i = rx; i <= rx + BlockWidth * 2 - 1; i = i + 2)	//第一阶段由无到有
+				{
+
+					gotoxy(i, j);
+					printf("■");
+				}
+			}
 		}
 	}
 	gotoxy(0, 52);
@@ -440,34 +481,34 @@ void welcome() {
 				system("cls");
 				break;
 			}
-
 		}
-
 	}
 
 }
 
 void rePlay() {
-	int n;
-	printf("重新开始游戏按“1”，结束游戏按“2”,返回主菜单按“3”！\n\n");
-	scanf_s("%d", &n);
-	switch (n) {
-	case 1:
-		system("cls");
-		createLine();
-		windowProgress();
-		break;
-	case 2:
-		exit(0);
-		break;
-	case 3:
-		system("cls");
-		welcome();
-		break;
-	default:
-		printf("输入有误");
-		break;
-	}
+		int n;
+		printf("重新开始游戏按“1”，结束游戏按“2”,返回主菜单按“3”！\n\n");
+		scanf_s("%d", &n);
+		switch (n) {
+			case 1:
+				system("cls");
+				createLine();
+				windowProgress();
+				break;
+			case 2:
+				exit(0);
+				break;
+			case 3:
+				system("cls");
+				welcome();
+				break;
+			default:
+				printf("输入有误,请重新输入");
+				break;
+		}
+	
+	
 }
 /**
 窗口处理		1.清除痕迹 2.交换数据 3.重新绘制块 4.按键下移
@@ -529,7 +570,8 @@ void  windowProgress() {
 			gotoxy(0, 53);
 		}
 		else
-		{	int n;
+		{	
+			int n;
 			printf("叫你别踩白块啦！！\n\n");		
 			rePlay();
 		}
@@ -546,21 +588,102 @@ void  windowProgress() {
 void windowProgress2(){
 	int i, j;							//方块位置向下
 	int tmp;
-	int score = 0;						//分数
+	int count = 0,score=0;						//计数器
 	int key[4] = { 100,102,106,107 };
-	int  bblock=0;						//四个黑块的位置
-
+	int  bblock[4];						//四个黑块的位置
+	int speed = 500;
+	int	flag = 1;
+	int ch;
+	int array[200];
 
 	srand((unsigned int)time(NULL));    //时间种子，设置随机数用的	
+	randCreateBlock(bblock);			//产生块
+	clock_t start, finish = 0;
+	double time;
 
-	randCreateBlock2();			//产生块
+	paintScoreBox(0);
+	tmp = bblock[3];
+	if (_getch() == key[tmp])	//触发开始游戏
+	{
+		while (flag)
+		{			
+			array[count] = bblock[3];
+		   //if (count % 5 == 0&&speed>=250)		//速度控制
+		   //	speed =speed -35;
+		   /*if (count % 5 == 0 && speed < 350)
+		   	speed = speed - 10;*/
+		   if (score == 20)
+			   break;
+		   Sleep(speed);
 
 
-
+		   if (count == 1)
+		   {
+		   	start = clock();
+		   }
+		   if (count == 199)
+		   {
+		   	finish = clock();
+		   	time = (double)(finish - start) / CLK_TCK;
+		   	gotoxy(0, 53);
+		   
+		   	if (time < readmaxScore())
+		   	{
+		   		printf("恭喜你创新纪录了！\n");
+		   		storeScore(time);
+		   	}
+		   	printf("%f", time);
+		   	paintScoreBox(time);
+		   	break;
+		   }
+		   for (j = 0; j < 4; j++)
+		   {
+		   	cleanBlock(bblock[j], j);		//清除痕迹
+		   }
+		   
+		   for (i = 3; i >= 1; i--)
+		   {
+		   	bblock[i] = bblock[i - 1];	   //数据交换
+		   }
+		   
+		   bblock[0] = rand() % 4;
+		   if (_kbhit())
+		   {
+			   ch = _getch();
+			   if (ch == key[bblock[2]]|| ch == key[bblock[3]])
+			   {
+				   score++;
+				   gotoxy(100, 50);
+				   printf("%d %d", ch, score);
+			   }
+		   }
+		   for (j = 0; j < 4; j++)		      //重新绘制
+		   {
+		   	paintBlock(bblock[j], j);
+		   }
+		   if (_kbhit())
+		   {
+			   ch = _getch();
+			   if (ch == key[bblock[3]])
+			   {
+				   score++;
+				   gotoxy(100, 50);
+				   printf("%d %d", ch, score);
+			   }
+		   }
+		   
+		   count++;
+		}
+	}
+	else
+	{
+		rePlay();
+	}
 }
 
 int main() {
 	full_screen();
+	HideCursor();
 	system("color 70");		//设置背景，字颜色 
 	welcome();
 	return 0;
