@@ -303,10 +303,17 @@ void listenKeyBoard() {
 /**
 读取最高分数
 */
-double readmaxScore() {
+double readmaxScore(int mod) {
 	double maxScore;
-	FILE* fp;
-	fopen_s(&fp, "score.txt", "r");//r+读写 ，如果不存在就创建
+	FILE *fp=NULL;
+	if (mod == 1) 
+	{
+		fopen_s(&fp, "score.txt", "r");//r+读写 ，如果不存在就创建		
+	}
+	else if(mod == 2)
+	{
+		fopen_s(&fp, "score2.txt", "r");//r+读写 ，如果不存在就创建		
+	}
 	fscanf_s(fp, "%lf", &maxScore);
 	fclose(fp);
 	return maxScore;
@@ -316,7 +323,7 @@ double readmaxScore() {
 绘制分数框
 */
 
-void paintScoreBox(double time) {					//分数
+void paintScoreBox(double result,int mod) {					//分数
 
 
 	int heigh = 15, width = 60;
@@ -337,23 +344,42 @@ void paintScoreBox(double time) {					//分数
 		gotoxy(100 + width, i);
 		printf("☆");
 	}
-	gotoxy(125, 28);
-	printf("您的用时:%.4f",time);	//显示当前分数
-	gotoxy(125, 25);
-	printf("最短用时:%.4f", readmaxScore());	//显示最高分数
-	gotoxy(0, 53);
+	if (mod == 1) {
+		gotoxy(125, 28);
+		printf("您的用时:%.4f", result);	//显示当前分数
+		gotoxy(125, 25);
+		printf("最短用时:%.4f", readmaxScore(mod));	//显示最高分数
+		gotoxy(0, 53);
+	}
+	else if(mod == 2) {
+		gotoxy(125, 28);
+		printf("您的命中率:%.4f", result);	//显示当前分数
+		gotoxy(125, 25);
+		printf("最好记录:%.4f", readmaxScore(mod));	//显示最高分数
+		gotoxy(0, 53);
+	}
+	
 	//printf("%f", duration);
 }
 
 /**
 保存最高分进文件
 */
-void storeScore(double score)
+void storeScore(double score,int mod)
 {
 	FILE* fp;
-	fopen_s(&fp, "score.txt", "w");//w写 ，如果不存在就创建
-	fprintf(fp, "%lf\n", score);
-	fclose(fp);
+	if (mod == 1) {
+		fopen_s(&fp, "score.txt", "w");//w写 ，如果不存在就创建
+		fprintf(fp, "%lf\n", score);
+		fclose(fp);
+	}
+	else if (mod == 2)
+	{
+		fopen_s(&fp, "score2.txt", "w");//w写 ，如果不存在就创建
+		fprintf(fp, "%lf\n", score);
+		fclose(fp);
+	}
+	
 }
 /**
 欢迎界面
@@ -388,12 +414,6 @@ void welcome() {
 		printf("请选择[1,2,3]:[ ]\b\b");
 		scanf_s("%d", &n);
 		switch (n) {
-		case 0:
-			system("cls");
-			createLine2();
-			windowProgress2();
-			flag = 0;
-			break;
 		case 1:
 			/*
 			模式界面选择
@@ -489,6 +509,7 @@ void welcome() {
 void rePlay(int mod) {
 		int n;
 		printf("重新开始游戏按“1”，结束游戏按“2”,返回主菜单按“3”！\n\n");
+		Sleep(1000);
 		scanf_s("%d", &n);
 		if(mod==1)
 		switch (n) {
@@ -512,7 +533,7 @@ void rePlay(int mod) {
 			switch (n) {
 			case 1:
 				system("cls");
-				createLine();
+				createLine2();
 				windowProgress2();
 				break;
 			case 2:
@@ -529,6 +550,25 @@ void rePlay(int mod) {
 		}
 	
 }
+void printMiss() {
+	gotoxy(100, 40);
+	printf("MMMMMMMMMMMMM	IIIIIIIIIII           SSSSSSS               SSSSSSS            !\n");
+	gotoxy(100, 41);
+	printf("MM   MM    MM	    III             SSS      SSS          SSS      SSS         !\n");
+	gotoxy(100, 42);
+	printf("MM   MM    MM	    III               SSS                   SSS                !\n");
+	gotoxy(100, 43);
+	printf("MM   MM    MM	    III                 SSSS                  SSSS             !\n");
+	gotoxy(100, 44);
+	printf("MM   MM    MM	    III                   SSSS                  SSSS           !\n");
+	gotoxy(100, 45);
+	printf("MM   MM    MM	    III             SSSS       SSS        SSSS       SSS       !\n");
+	gotoxy(100, 46);
+	printf("MM   MM    MM	    III              SSSS     SSSS         SSSS     SSSS       !\n");
+	gotoxy(100, 47);
+	printf("MM   MM    MM	IIIIIIIIIII              SSSSSS                SSSSSS          !\n");
+}
+
 /**
 窗口处理		1.清除痕迹 2.交换数据 3.重新绘制块 4.按键下移
 */
@@ -545,7 +585,7 @@ void  windowProgress() {
 	clock_t start,finish=0;
 	double time;
 
-	paintScoreBox(0);
+	paintScoreBox(0,1);
 	while (1)
 	{
 		
@@ -561,13 +601,13 @@ void  windowProgress() {
 				time = (double)(finish - start) / CLK_TCK;
 				gotoxy(0, 53);
 			
-				if (time < readmaxScore())
+				if (time < readmaxScore(1))
 				{
 					printf("恭喜你创新纪录了！\n");
-					storeScore(time);									
+					storeScore(time,1);									
 				}
 				printf("%f", time);
-				paintScoreBox(time);
+				paintScoreBox(time,1);
 				break;
 			}
 			for (j = 0; j < 4; j++)
@@ -613,20 +653,22 @@ void windowProgress2(){
 	int	flag = 1;
 	int ch;
 	int array[200];
-
+	double persent;
 	srand((unsigned int)time(NULL));    //时间种子，设置随机数用的	
 	randCreateBlock(bblock);			//产生块
 	clock_t start, finish = 0;
 	double time;
 
-	paintScoreBox(0);
+	paintScoreBox(0,2);
 	tmp = bblock[3];
 	if (_getch() == key[tmp])	//触发开始游戏
-	{
+	{	
+		
 		while (flag)
 		{	
-		   if (score == 140)
-			   break;		
+			
+			if (score == 10)
+				flag=0;
 		   array[count] = bblock[3];
 		   if (score>=10&&score % 10 == 0&&speed>=150)		//速度控制
 		   	speed =speed -25;
@@ -646,29 +688,39 @@ void windowProgress2(){
 		   if (_kbhit())
 		   {
 			   ch = _getch();
-			   if (ch == key[bblock[2]]|| ch == key[bblock[3]])			//判断是否命中
+			   if ( ch == key[bblock[2]]|| ch == key[bblock[3]])			//判断是否命中
 			   {
 				   score++;
 				   gotoxy(100, 50);
 				   printf("%d %d", ch, score);
 			   }
-			   else {
+			   else 
+			   {
 				   gotoxy(100, 50);
 				   printf("WRONG!");
 			   }
 		   }
-		   else {				//如果没有按下就会MISS
-			   gotoxy(100, 50);
-			   printf("MISS!");
+		   else 
+		   {						//如果没有按下就会MISS
+			   printMiss();
 		   }
-		   for (j = 0; j < 4; j++)		      //重新绘制
+
+		   for (j = 0; j < 4; j++)		 //重新绘制
 		   {
 		   	paintBlock(bblock[j], j);
-		   }		   
+		   }
+
 		   count++;
-		}
-		gotoxy(110, 50);
-		printf("%f %d %d",score/(double)count,count,score);
+		   persent = score / (double)count;
+		   paintScoreBox(persent, 2);
+		}	
+		gotoxy(0, 54);
+		if( persent > readmaxScore(2))
+		{
+			storeScore(persent,2);//写入
+		}	
+		paintScoreBox(persent, 2);
+		printf("游戏结束！\n");
 		rePlay(2);
 	}
 	else
