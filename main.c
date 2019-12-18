@@ -486,10 +486,11 @@ void welcome() {
 
 }
 
-void rePlay() {
+void rePlay(int mod) {
 		int n;
 		printf("重新开始游戏按“1”，结束游戏按“2”,返回主菜单按“3”！\n\n");
 		scanf_s("%d", &n);
+		if(mod==1)
 		switch (n) {
 			case 1:
 				system("cls");
@@ -507,7 +508,25 @@ void rePlay() {
 				printf("输入有误,请重新输入");
 				break;
 		}
-	
+		else if (mod == 2) {
+			switch (n) {
+			case 1:
+				system("cls");
+				createLine();
+				windowProgress2();
+				break;
+			case 2:
+				exit(0);
+				break;
+			case 3:
+				system("cls");
+				welcome();
+				break;
+			default:
+				printf("输入有误,请重新输入");
+				break;
+			}
+		}
 	
 }
 /**
@@ -519,7 +538,6 @@ void  windowProgress() {
 	int score = 0;						//分数
 	int key[4] = { 100,102,106,107 };
 	int  bblock[4];						//四个黑块的位置
-
 
 	srand((unsigned int)time(NULL));    //时间种子，设置随机数用的	
 
@@ -573,10 +591,10 @@ void  windowProgress() {
 		{	
 			int n;
 			printf("叫你别踩白块啦！！\n\n");		
-			rePlay();
+			rePlay(1);
 		}
 	}
-	rePlay();
+	rePlay(1);
 
 
 }
@@ -606,36 +624,14 @@ void windowProgress2(){
 	if (_getch() == key[tmp])	//触发开始游戏
 	{
 		while (flag)
-		{			
-			array[count] = bblock[3];
-		   //if (count % 5 == 0&&speed>=250)		//速度控制
-		   //	speed =speed -35;
-		   /*if (count % 5 == 0 && speed < 350)
-		   	speed = speed - 10;*/
-		   if (score == 20)
-			   break;
-		   Sleep(speed);
-
-
-		   if (count == 1)
-		   {
-		   	start = clock();
-		   }
-		   if (count == 199)
-		   {
-		   	finish = clock();
-		   	time = (double)(finish - start) / CLK_TCK;
-		   	gotoxy(0, 53);
+		{	
+		   if (score == 140)
+			   break;		
+		   array[count] = bblock[3];
+		   if (score>=10&&score % 10 == 0&&speed>=150)		//速度控制
+		   	speed =speed -25;
 		   
-		   	if (time < readmaxScore())
-		   	{
-		   		printf("恭喜你创新纪录了！\n");
-		   		storeScore(time);
-		   	}
-		   	printf("%f", time);
-		   	paintScoreBox(time);
-		   	break;
-		   }
+		   Sleep(speed);	  
 		   for (j = 0; j < 4; j++)
 		   {
 		   	cleanBlock(bblock[j], j);		//清除痕迹
@@ -650,36 +646,37 @@ void windowProgress2(){
 		   if (_kbhit())
 		   {
 			   ch = _getch();
-			   if (ch == key[bblock[2]]|| ch == key[bblock[3]])
+			   if (ch == key[bblock[2]]|| ch == key[bblock[3]])			//判断是否命中
 			   {
 				   score++;
 				   gotoxy(100, 50);
 				   printf("%d %d", ch, score);
 			   }
+			   else {
+				   gotoxy(100, 50);
+				   printf("WRONG!");
+			   }
+		   }
+		   else {				//如果没有按下就会MISS
+			   gotoxy(100, 50);
+			   printf("MISS!");
 		   }
 		   for (j = 0; j < 4; j++)		      //重新绘制
 		   {
 		   	paintBlock(bblock[j], j);
-		   }
-		   if (_kbhit())
-		   {
-			   ch = _getch();
-			   if (ch == key[bblock[3]])
-			   {
-				   score++;
-				   gotoxy(100, 50);
-				   printf("%d %d", ch, score);
-			   }
-		   }
-		   
+		   }		   
 		   count++;
 		}
+		gotoxy(110, 50);
+		printf("%f %d %d",score/(double)count,count,score);
+		rePlay(2);
 	}
 	else
 	{
-		rePlay();
+		rePlay(2);
 	}
 }
+
 
 int main() {
 	full_screen();
