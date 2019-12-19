@@ -248,26 +248,6 @@ void  randCreateBlock(int bblock[]) {
 }
 
 /**
-随机产生方块2
-*/
-void  randCreateBlock2() {
-
-	int i,x;
-	int haspaint = 0;
-	while (1)
-	{
-		//Sleep(1000);		
-		x = rand() % 4;	
-		paintBlock2(x);
-			
-
-		
-	}
-	//bblock[0] = rand() % 4;
-	//paintBlock2(bblock[0]);
-}
-
-/**
 清除上次的痕迹
 */
 void cleanBlock(int x, int y) {
@@ -506,6 +486,9 @@ void welcome() {
 
 }
 
+/**
+重玩
+*/
 void rePlay(int mod) {
 		int n;
 		printf("重新开始游戏按“1”，结束游戏按“2”,返回主菜单按“3”！\n\n");
