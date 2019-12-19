@@ -333,9 +333,9 @@ void storeScore(double score,int mod)
 */
 void welcome() {
 	//system("cls");
-	int n, m, flag = 1;
+	int n=0, m=0, flag = 1;
 	int i, j = 1;
-	int k = 1;
+	int k = 1; 
 	while (flag == 1) {
 		gotoxy(43, 18);
 		printf("别 踩 白 块");
@@ -358,21 +358,21 @@ void welcome() {
 		printf("3.退出游戏");
 		gotoxy(29, 27);
 		printf("请选择[1,2,3]:[ ]\b\b");
-		char ch;
-		ch = getchar();
+		char ch1;
+		ch1 = getchar();
 		int p = 1;
 		if (p) {
 			
-			if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {//判断是不是字母
+			if ((ch1 >= 'a' && ch1 <= 'z') || (ch1 >= 'A' && ch1 <= 'Z')) {//判断是不是字母
 
 				printf("字母,重新输入！\n");
 				welcome();
 			}
 
-			else if (ch >= '0' && ch <= '9')//判断是不是数字
+			else if (ch1 >= '0' && ch1 <= '9')//判断是不是数字
 
 			{
-				n = chartonumber(ch);
+				n = chartonumber(ch1);
 				p = 0;
 			}
 			else {
@@ -392,8 +392,9 @@ void welcome() {
 			模式界面选择
 			*/
 			while (k==1) {
-			system("cls");
-				//printf("")
+				int u3 = 1; int poq = 1; char ch2; int mm = 0;
+				system("cls");
+
 				for (i = 20; i <= 26; i++)
 				{
 					for (j = 27; j <= 74; j++)
@@ -415,10 +416,34 @@ void welcome() {
 					printf("3.返回主菜单");
 					gotoxy(29, 27);
 					printf("请选择[1,2,3]:[ ]\b\b");
-					scanf_s("%d", &m);
-			
-					switch (m)
-					{
+					//scanf_s("%d", &m);
+					scanf_s(" %c", &ch2);
+						while(u3) {
+							while(poq){
+
+								if ((ch2 >= 'a' && ch2 <= 'z') || (ch2 >= 'A' && ch2 <= 'Z')) {//判断是不是字母
+									Sleep(500);
+									
+									u3 = 0;
+									poq = 0;
+								}
+	
+								else if (ch2 >= '0' && ch2 <= '9'){//判断是不是数字
+									mm = chartonumber(ch2);
+									u3 = 0;
+									poq = 0;
+								}
+								
+								else {
+									Sleep(500);
+									u3 = 0;
+									poq = 0;
+								}
+
+							}
+						}
+						switch (mm)
+						{
 						case 1:
 							system("cls");
 							createLine();
@@ -432,6 +457,7 @@ void welcome() {
 							k = 0;
 							break;
 						case 3:
+							system("cls");
 							welcome();
 							break;
 						default:
@@ -445,7 +471,9 @@ void welcome() {
 							}
 
 					}
+						
 			}
+					
 			flag = 0;
 			break;
 		case 2:
@@ -483,19 +511,54 @@ void welcome() {
 重玩
 */
 void rePlay(int mod) {
-
-	while (1) {
-		int n;
+	int u2 = 0;
+	int u1 = 1;
+	while (u1) {
+		int n1;
 		printf("重新开始游戏按“1”，结束游戏按“2”,返回主菜单按“3”！\n\n");
 		Sleep(1000);
-		scanf_s("%d", &n);
+		
 		int k = 1;
 		int a = 1;
 		int b = 1;
+		//scanf_s("%c", &n1);
+		
+		
+		char ch3;
+		scanf_s(" %c", &ch3);
+		int poc = 1;
+		while (poc) {
+
+			if ((ch3 >= 'a' && ch3 <= 'z') || (ch3 >= 'A' && ch3 <= 'Z')) {//判断是不是字母
+
+				printf("字母,返回重新输入！\n");
+				Sleep(200);
+
+				rePlay(mod);
+
+			}
+
+			else if (ch3 >= '0' && ch3 <= '9')//判断是不是数字
+
+			{
+				u2 = chartonumber(ch3);
+				poc = 0;
+			}
+			else {
+				printf("非数字！返回重新输入！\n");
+				Sleep(200);
+				rePlay(mod);
+
+			}
+		}
+
+
+
 
 		if (mod == 1) {
 			while (a) {
-				switch (n) {
+
+				switch (u2) {
 				case 1:
 					system("cls");
 					createLine();
@@ -520,7 +583,7 @@ void rePlay(int mod) {
 		else if (mod == 2) {
 
 			while (b) {
-				switch (n) {
+				switch (u2) {
 				case 1:
 					system("cls");
 					createLine2();
