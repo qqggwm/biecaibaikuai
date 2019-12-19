@@ -457,54 +457,72 @@ void welcome() {
 重玩
 */
 void rePlay(int mod) {
+
+	while (1) {
 		int n;
 		printf("重新开始游戏按“1”，结束游戏按“2”,返回主菜单按“3”！\n\n");
 		Sleep(1000);
 		scanf_s("%d", &n);
-		if(mod==1)
-		switch (n) {
-			case 1:
-				system("cls");
-				createLine();
-				windowProgress();
-				break;
-			case 2:
-				exit(0);
-				break;
-			case 3:
-				system("cls");
-				welcome();
-				break;
-			default:
-				printf("输入有误,请重新输入");
-				break;
-		}
-		else if (mod == 2) {
-			switch (n) {
-			case 1:
-				system("cls");
-				createLine2();
-				windowProgress2();
-				break;
-			case 2:
-				exit(0);
-				break;
-			case 3:
-				system("cls");
-				welcome();
-				break;
-			default:
-				printf("输入有误,请重新输入");
-				break;
-			}
-		}
-	
-}
+		int k = 1;
+		int a = 1;
+		int b = 1;
 
+		if (mod == 1) {
+			while (a) {
+				switch (n) {
+				case 1:
+					system("cls");
+					createLine();
+					windowProgress();
+					break;
+				case 2:
+					exit(0);
+					break;
+				case 3:
+					system("cls");
+					welcome();
+					break;
+				default:
+					printf("输入有误,请重新输入\n");
+					a = 0;
+					break;
+				}
+			}
+
+		}
+
+		else if (mod == 2) {
+
+			while (b) {
+				switch (n) {
+				case 1:
+					system("cls");
+					createLine2();
+					windowProgress2();
+					break;
+				case 2:
+					exit(0);
+					break;
+				case 3:
+					system("cls");
+					welcome();
+					break;
+				default:
+					printf("输入有误,请重新输入\n");
+					b = 0;
+					break;
+				}
+			}
+
+		}
+	}
+
+
+}
 /**
 提示WRONG
 */
-void printWrong() {
+void printWrong(){
 	setRed();
 	gotoxy(100, 40);
 	printf("                       XXXX              XXXX     \n");
@@ -637,7 +655,6 @@ void  windowProgress() {
 		}
 		else
 		{	
-			int n;
 			printf("叫你别踩白块啦！！\n\n");		
 			rePlay(1);
 		}
@@ -660,8 +677,6 @@ void windowProgress2(){
 	double persent;
 	srand((unsigned int)time(NULL));    //时间种子，设置随机数用的	
 	randCreateBlock(bblock);			//产生块
-	clock_t start, finish = 0;
-	double time;
 
 	paintScoreBox(0,2);
 	tmp = bblock[3];
@@ -669,10 +684,10 @@ void windowProgress2(){
 	{			
 		while (flag)
 		{	
-		if (score == 100)
-					flag=0;
-		   if (score>=10&&score % 10 == 0&&speed>150)		//速度控制
-		   	speed =speed -50;
+			if (score == 100)
+				flag=0;
+		   if (score>=10 &&score%10 == 0 && speed>150)		//速度控制
+		   	speed = speed -50;
 		   else if(score >= 10 && score % 10 == 0 && speed > 125)
 			 speed = speed - 25;
 		   Sleep(speed);	  
@@ -713,10 +728,10 @@ void windowProgress2(){
 					   paintBlock(bblock[j], j);
 				   }
 				   gotoxy(0, 53);
-				   printf("已 暂 停, 输 入 任 意 键 开 始......");		//暂停
+				   printf("已 暂 停, 输 入 任 意 键 开 始...");		//暂停
 				   _getch();
 				   gotoxy(0, 53);
-				   printf("                    ");				   
+				   printf("                                   ");				   
 				}
 		   }
 		   else 
