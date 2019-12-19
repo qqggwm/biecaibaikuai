@@ -18,7 +18,7 @@ void windowProgress2();
 */
 void HideCursor()
 {
-	CONSOLE_CURSOR_INFO cursor;
+	CONSOLE_CURSOR_INFO cursor;//结构包含的是控制台光标的信息
 	cursor.bVisible = FALSE;
 	cursor.dwSize = sizeof(cursor);
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -31,7 +31,7 @@ void HideCursor()
 void gotoxy(int x, int  y) {
 	//调用win32api设置光标位置
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-	COORD coord;
+	COORD coord;//一个字符在控制台屏幕上的坐标
 	coord.X = x;
 	coord.Y = y;
 	SetConsoleCursorPosition(handle, coord);
@@ -41,7 +41,7 @@ void gotoxy(int x, int  y) {
 窗口最大化
 */
 void full_screen()
-{
+{//父窗句柄
 	HWND hwnd = GetForegroundWindow();
 	int cx = GetSystemMetrics(SM_CXSCREEN);            /* 屏幕宽度 像素 */
 	int cy = GetSystemMetrics(SM_CYSCREEN);            /* 屏幕高度 像素 */
@@ -507,47 +507,66 @@ void welcome() {
 }
 
 void rePlay(int mod) {
+		
+		while(1){
 		int n;
 		printf("重新开始游戏按“1”，结束游戏按“2”,返回主菜单按“3”！\n\n");
 		Sleep(1000);
 		scanf_s("%d", &n);
-		if(mod==1)
-		switch (n) {
-			case 1:
-				system("cls");
-				createLine();
-				windowProgress();
-				break;
-			case 2:
-				exit(0);
-				break;
-			case 3:
-				system("cls");
-				welcome();
-				break;
-			default:
-				printf("输入有误,请重新输入");
-				break;
-		}
-		else if (mod == 2) {
+		int k = 1;
+		int a = 1;
+		int b = 1;
+
+		if (mod == 1) {
+			while (a) {
 			switch (n) {
-			case 1:
-				system("cls");
-				createLine2();
-				windowProgress2();
-				break;
-			case 2:
-				exit(0);
-				break;
-			case 3:
-				system("cls");
-				welcome();
-				break;
-			default:
-				printf("输入有误,请重新输入");
-				break;
+				case 1:
+					system("cls");
+					createLine();
+					windowProgress();
+					break;
+				case 2:
+					exit(0);
+					break;
+				case 3:
+					system("cls");
+					welcome();
+					break;
+				default:
+					printf("输入有误,请重新输入\n");
+					a = 0;
+					break;
 			}
+			}
+
 		}
+		
+		else if (mod == 2) {
+			
+			while(b){
+				switch (n) {
+				case 1:
+					system("cls");
+					createLine2();
+					windowProgress2();
+					break;
+				case 2:
+					exit(0);
+					break;
+				case 3:
+					system("cls");
+					welcome();
+					break; 
+				default:
+					printf("输入有误,请重新输入\n");
+					b = 0;
+					break;
+				}
+			}
+
+		}
+	}
+	
 	
 }
 void printMiss() {
