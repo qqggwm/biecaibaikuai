@@ -7,10 +7,10 @@
 
 #define  MaxHeigh 53		//5+12*4
 #define  MaxWidth 88		//(10*4+5)*2
-#define	 BlockWidth 10	//一个Block宽度为10
-#define	 BlockHeigh 12	//一个Block高度为12
+#define	 BlockWidth 10		//一个Block宽度为10
+#define	 BlockHeigh 12		//一个Block高度为12
 
-void  windowProgress();
+void windowProgress();
 void windowProgress2();
 
 /**
@@ -18,7 +18,7 @@ void windowProgress2();
 */
 void HideCursor()
 {
-	CONSOLE_CURSOR_INFO cursor;//结构包含的是控制台光标的信息
+	CONSOLE_CURSOR_INFO cursor;
 	cursor.bVisible = FALSE;
 	cursor.dwSize = sizeof(cursor);
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -31,7 +31,7 @@ void HideCursor()
 void gotoxy(int x, int  y) {
 	//调用win32api设置光标位置
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-	COORD coord;//一个字符在控制台屏幕上的坐标
+	COORD coord;
 	coord.X = x;
 	coord.Y = y;
 	SetConsoleCursorPosition(handle, coord);
@@ -41,7 +41,7 @@ void gotoxy(int x, int  y) {
 窗口最大化
 */
 void full_screen()
-{//父窗句柄
+{
 	HWND hwnd = GetForegroundWindow();
 	int cx = GetSystemMetrics(SM_CXSCREEN);            /* 屏幕宽度 像素 */
 	int cy = GetSystemMetrics(SM_CYSCREEN);            /* 屏幕高度 像素 */
@@ -51,6 +51,23 @@ void full_screen()
 	SetWindowLong(hwnd, GWL_STYLE, (l_WinStyle | WS_POPUP | WS_MAXIMIZE) & ~WS_CAPTION & ~WS_THICKFRAME & ~WS_BORDER);
 
 	SetWindowPos(hwnd, HWND_TOP, 0, 0, cx, cy, 0);
+}
+
+/**
+设置红颜色
+*/
+void setRed() {
+	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(handle, FOREGROUND_RED + 7 * 0x10);//FOREGROUND_INTENSITY |
+}
+
+
+/**
+设置颜色
+*/
+void setWhite() {
+	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(handle, 0 + 7 * 0x10);
 }
 
 /**
@@ -124,12 +141,22 @@ void createLine2()
 		printf("□");
 
 	}
+
+	for (j = 2; j < MaxWidth; j += 2)	//黄线区间：识别区
+	{
+		setRed();
+		gotoxy(j, 26);
+		printf("■");
+
+		gotoxy(j,39);
+		printf("■");
+
+	}
+	setWhite();
 	printf("\n");
 
 }
-/**
-设置颜色
-*/
+
 
 /**
 生成方块
@@ -169,68 +196,7 @@ void  paintBlock1(int x, int y) {
 	}
 	gotoxy(0, 52);
 }
-/**
-生成方块2
-*/
-void  paintBlock2(int x){
-	int  i,j;
-	int  rx = (x * BlockWidth + x + 1) * 2;//加上线和前面的块才是真正的x坐标，并且一个方块（线）占两个字符
-	//int  ry = y * BlockHeigh + y + 1;	
-	int speed =100;
-	for (j = 1; j <= 12; j++) 
-	{
-		Sleep(speed);
-		for (i = rx; i <= rx + BlockWidth * 2 - 1; i = i + 2)	//第一阶段由无到有
-			{
-		
-				gotoxy(i, j);
-				printf("■");	
-			}
-	}	
-	int top = 1, bottom = j;	//辅助定位，块顶部，底部所在的位置
-	while (top <= 51)
-	{
 
-		Sleep(speed);
-		if (bottom <= 51) {
-			for (i = rx; i <= rx + BlockWidth * 2 - 1; i = i + 2)		//第二阶段由完整块到底部触底
-			{
-				gotoxy(i, top);
-				printf("  ");
-
-				gotoxy(i, bottom);
-				printf("■");
-
-			}
-		}
-		else
-		{
-			for (i = rx; i <= rx + BlockWidth * 2 - 1; i = i + 2)		//第三阶段由完整块底部触底到消失
-			{
-				gotoxy(i, top);
-				printf("  ");
-			}
-		}
-		top++; bottom++;
-		if (top >= 2)
-		{
-			int x = rand() % 4;
-			rx = (x * BlockWidth + x + 1) * 2;
-			for (j=1; j <= 12; j++)
-			{
-				Sleep(speed);
-				for (i = rx; i <= rx + BlockWidth * 2 - 1; i = i + 2)	//第一阶段由无到有
-				{
-
-					gotoxy(i, j);
-					printf("■");
-				}
-			}
-		}
-	}
-	gotoxy(0, 52);
-
-}
 /**
 随机产生方块
 */
@@ -245,26 +211,6 @@ void  randCreateBlock(int bblock[]) {
 		
 	}
 
-}
-
-/**
-随机产生方块2
-*/
-void  randCreateBlock2() {
-
-	int i,x;
-	int haspaint = 0;
-	while (1)
-	{
-		//Sleep(1000);		
-		x = rand() % 4;	
-		paintBlock2(x);
-			
-
-		
-	}
-	//bblock[0] = rand() % 4;
-	//paintBlock2(bblock[0]);
 }
 
 /**
@@ -322,44 +268,44 @@ double readmaxScore(int mod) {
 /**
 绘制分数框
 */
-
 void paintScoreBox(double result,int mod) {					//分数
 
 
-	int heigh = 15, width = 60;
+	int heigh = 35, width = 60;
 	int i;
-	//double duration;
-	//duration = (double)(finish - first) / CLOCKS_PER_SEC;
 
 	for (i = 100; i <= 100 + width; i = i + 2) {	//分数框上下
-		gotoxy(i, 20);
+		gotoxy(i, 1);
 		printf("☆");
 		gotoxy(i, 35);
 		printf("☆");
 	}
 	gotoxy(100, 20);
-	for (i = 20; i <= 35; i++) {	//分数框左右
+	for (i = 1; i <= 35; i++) {	//分数框左右
 		gotoxy(100, i);
 		printf("☆");
 		gotoxy(100 + width, i);
 		printf("☆");
 	}
 	if (mod == 1) {
-		gotoxy(125, 28);
-		printf("您的用时:%.4f", result);	//显示当前分数
-		gotoxy(125, 25);
-		printf("最短用时:%.4f", readmaxScore(mod));	//显示最高分数
-		gotoxy(0, 53);
+		gotoxy(120, 10);
+		printf("您的用时:%.4fs", result);	//显示当前分数
+		gotoxy(120, 5);
+		printf("最短用时:%.4fs", readmaxScore(mod));	//显示最高分数
+		
 	}
 	else if(mod == 2) {
-		gotoxy(125, 28);
-		printf("您的命中率:%.4f", result);	//显示当前分数
-		gotoxy(125, 25);
-		printf("最好记录:%.4f", readmaxScore(mod));	//显示最高分数
-		gotoxy(0, 53);
+		gotoxy(120, 10);
+		printf("您的命中率:%.2f%%", result*100);	//显示当前分数
+		gotoxy(120, 5);
+		printf("最好记录:%.2f%%", readmaxScore(mod)*100);	//显示最高分数
+		
 	}
-	
-	//printf("%f", duration);
+	gotoxy(110, 18);
+	printf("键位提示 D F J K 空格键暂停 ESC停止游戏");
+	gotoxy(110, 19);
+	printf("红色区间内为识别区");
+	gotoxy(0, 53);
 }
 
 /**
@@ -381,6 +327,7 @@ void storeScore(double score,int mod)
 	}
 	
 }
+
 /**
 欢迎界面
 */
@@ -506,9 +453,12 @@ void welcome() {
 
 }
 
+/**
+重玩
+*/
 void rePlay(int mod) {
-		
-		while(1){
+
+	while (1) {
 		int n;
 		printf("重新开始游戏按“1”，结束游戏按“2”,返回主菜单按“3”！\n\n");
 		Sleep(1000);
@@ -519,7 +469,7 @@ void rePlay(int mod) {
 
 		if (mod == 1) {
 			while (a) {
-			switch (n) {
+				switch (n) {
 				case 1:
 					system("cls");
 					createLine();
@@ -536,14 +486,14 @@ void rePlay(int mod) {
 					printf("输入有误,请重新输入\n");
 					a = 0;
 					break;
-			}
+				}
 			}
 
 		}
-		
+
 		else if (mod == 2) {
-			
-			while(b){
+
+			while (b) {
 				switch (n) {
 				case 1:
 					system("cls");
@@ -556,7 +506,7 @@ void rePlay(int mod) {
 				case 3:
 					system("cls");
 					welcome();
-					break; 
+					break;
 				default:
 					printf("输入有误,请重新输入\n");
 					b = 0;
@@ -566,26 +516,82 @@ void rePlay(int mod) {
 
 		}
 	}
-	
-	
+
+
 }
-void printMiss() {
+/**
+提示WRONG
+*/
+void printWrong(){
+	setRed();
 	gotoxy(100, 40);
-	printf("MMMMMMMMMMMMM	IIIIIIIIIII           SSSSSSS               SSSSSSS            !\n");
+	printf("                       XXXX              XXXX     \n");
 	gotoxy(100, 41);
-	printf("MM   MM    MM	    III             SSS      SSS          SSS      SSS         !\n");
+	printf("                         XXXX          XXXX            \n");
 	gotoxy(100, 42);
-	printf("MM   MM    MM	    III               SSS                   SSS                !\n");
+	printf("                           XXXX      XXXX           \n");
 	gotoxy(100, 43);
-	printf("MM   MM    MM	    III                 SSSS                  SSSS             !\n");
+	printf("                             XXXX  XXXX          \n");
 	gotoxy(100, 44);
-	printf("MM   MM    MM	    III                   SSSS                  SSSS           !\n");
+	printf("                               XXXXXX                      \n");
 	gotoxy(100, 45);
-	printf("MM   MM    MM	    III             SSSS       SSS        SSSS       SSS       !\n");
+	printf("                             XXXX  XXXX			\n");
 	gotoxy(100, 46);
-	printf("MM   MM    MM	    III              SSSS     SSSS         SSSS     SSSS       !\n");
+	printf("                           XXXX      XXXX \n");
 	gotoxy(100, 47);
-	printf("MM   MM    MM	IIIIIIIIIII              SSSSSS                SSSSSS          !\n");
+	printf("                         XXXX          XXXX\n");
+	gotoxy(100, 48);
+	printf("                       XXXX              XXXX\n");
+	setWhite();
+}
+
+
+/**
+提示MISS
+*/
+void printMiss() {
+	setRed();
+	gotoxy(100, 40);
+	printf("MMMMMMMMMMMMM	IIIIIIIIIII           SSSSSSS               SSSSSSS            \n");
+	gotoxy(100, 41);
+	printf("MM   MM    MM	    III             SSS      SSS          SSS      SSS         \n");
+	gotoxy(100, 42);
+	printf("MM   MM    MM	    III               SSS                   SSS                \n");
+	gotoxy(100, 43);
+	printf("MM   MM    MM	    III                 SSSS                  SSSS             \n");
+	gotoxy(100, 44);
+	printf("MM   MM    MM	    III                   SSSS                  SSSS           \n");
+	gotoxy(100, 45);
+	printf("MM   MM    MM	    III             SSSS       SSS        SSSS       SSS       \n");
+	gotoxy(100, 46);
+	printf("MM   MM    MM	    III              SSSS     SSSS         SSSS     SSSS       \n");
+	gotoxy(100, 47);
+	printf("MM   MM    MM	IIIIIIIIIII              SSSSSS                SSSSSS          \n");
+	setWhite();
+}
+
+/**
+清除提示信息
+*/
+void cleanTips() {
+	gotoxy(100, 40);
+	printf("                                                                                 \n");
+	gotoxy(100, 41);																	     
+	printf("                                                                                 \n");
+	gotoxy(100, 42);																	     
+	printf("                                                                                 \n");
+	gotoxy(100, 43);																	     
+	printf("                                                                                 \n");
+	gotoxy(100, 44);																	     
+	printf("                                                                                 \n");
+	gotoxy(100, 45);																	     
+	printf("                                                                                 \n");
+	gotoxy(100, 46);																	     
+	printf("                                                                                 \n");
+	gotoxy(100, 47);																	     
+	printf("                                                                                 \n");
+	gotoxy(100, 48);
+	printf("                                                                                 \n");
 }
 
 /**
@@ -618,10 +624,11 @@ void  windowProgress() {
 			if (score == 5) {
 				finish = clock();
 				time = (double)(finish - start) / CLK_TCK;
+				
 				gotoxy(0, 53);
-			
 				if (time < readmaxScore(1))
-				{
+				{	
+					
 					printf("恭喜你创新纪录了！\n");
 					storeScore(time,1);									
 				}
@@ -648,16 +655,12 @@ void  windowProgress() {
 		}
 		else
 		{	
-			int n;
 			printf("叫你别踩白块啦！！\n\n");		
 			rePlay(1);
 		}
 	}
 	rePlay(1);
-
-
 }
-
 
 /*
 窗口处理2（模式2） 	
@@ -671,27 +674,22 @@ void windowProgress2(){
 	int speed = 500;
 	int	flag = 1;
 	int ch;
-	int array[200];
 	double persent;
 	srand((unsigned int)time(NULL));    //时间种子，设置随机数用的	
 	randCreateBlock(bblock);			//产生块
-	clock_t start, finish = 0;
-	double time;
 
 	paintScoreBox(0,2);
 	tmp = bblock[3];
 	if (_getch() == key[tmp])	//触发开始游戏
-	{	
-		
+	{			
 		while (flag)
 		{	
-			
-			if (score == 10)
+			if (score == 100)
 				flag=0;
-		   array[count] = bblock[3];
-		   if (score>=10&&score % 10 == 0&&speed>=150)		//速度控制
-		   	speed =speed -25;
-		   
+		   if (score>=10 &&score%10 == 0 && speed>150)		//速度控制
+		   	speed = speed -50;
+		   else if(score >= 10 && score % 10 == 0 && speed > 125)
+			 speed = speed - 25;
 		   Sleep(speed);	  
 		   for (j = 0; j < 4; j++)
 		   {
@@ -705,30 +703,46 @@ void windowProgress2(){
 		   
 		   bblock[0] = rand() % 4;
 		   if (_kbhit())
-		   {
+		   {	
+			   cleanTips();
 			   ch = _getch();
-			   if ( ch == key[bblock[2]]|| ch == key[bblock[3]])			//判断是否命中
+			   if (  ch == key[bblock[3]])			//判断是否命中ch == key[bblock[2]]||
 			   {
 				   score++;
 				   gotoxy(100, 50);
 				   printf("%d %d", ch, score);
 			   }
 			   else 
-			   {
-				   gotoxy(100, 50);
-				   printf("WRONG!");
+			   {	
+				   cleanTips();
+				   printWrong();
 			   }
+			   if (ch == 27)
+			   {	   				   
+				  break;			//停止
+			   }
+			   if (ch == 32)		//暂停
+			   {	
+				   for (j = 0; j < 4; j++)		 //重新绘制
+				   {
+					   paintBlock(bblock[j], j);
+				   }
+				   gotoxy(0, 53);
+				   printf("已 暂 停, 输 入 任 意 键 开 始...");		//暂停
+				   _getch();
+				   gotoxy(0, 53);
+				   printf("                                   ");				   
+				}
 		   }
 		   else 
-		   {						//如果没有按下就会MISS
-			   printMiss();
+		   {	
+			   cleanTips();
+			   printMiss();//如果没有按下就会MISS
 		   }
-
 		   for (j = 0; j < 4; j++)		 //重新绘制
 		   {
 		   	paintBlock(bblock[j], j);
 		   }
-
 		   count++;
 		   persent = score / (double)count;
 		   paintScoreBox(persent, 2);
@@ -737,6 +751,7 @@ void windowProgress2(){
 		if( persent > readmaxScore(2))
 		{
 			storeScore(persent,2);//写入
+			printf("恭喜你破纪录啦！！！");
 		}	
 		paintScoreBox(persent, 2);
 		printf("游戏结束！\n");
@@ -746,6 +761,7 @@ void windowProgress2(){
 	{
 		rePlay(2);
 	}
+	gotoxy(0, 53);
 }
 
 
