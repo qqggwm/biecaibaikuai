@@ -9,7 +9,7 @@
 #define  MaxWidth 88		//(10*4+5)*2
 #define	 BlockWidth 10		//一个Block宽度为10
 #define	 BlockHeigh 12		//一个Block高度为12
-
+#define chartonumber(x) (x-'0')
 void windowProgress();
 void windowProgress2();
 
@@ -58,7 +58,7 @@ void full_screen()
 */
 void setRed() {
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleTextAttribute(handle, FOREGROUND_RED + 7 * 0x10);//FOREGROUND_INTENSITY |
+	SetConsoleTextAttribute(handle, FOREGROUND_RED + 7 * 0x10);//FOREGROUND_INTENSITY |背景色
 }
 
 
@@ -67,12 +67,12 @@ void setRed() {
 */
 void setWhite() {
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleTextAttribute(handle, 0 + 7 * 0x10);
+	SetConsoleTextAttribute(handle, 0 + 7 * 0x10);//字体
 }
 
 /**
 画边框
-*/
+*/	
 void createLine()
 {
 	int i, j;
@@ -237,14 +237,14 @@ void cleanBlock(int x, int y) {
 
 /**
 监听键盘按键
-*/
+
 void listenKeyBoard() {
 	if (_kbhit()) {
 		char ch = _getch();
 		printf("%c", ch);
 		printf("%d", ch);
 	}
-}
+}*/
 
 /**
 读取最高分数
@@ -356,10 +356,36 @@ void welcome() {
 		printf("2.游戏说明");
 		gotoxy(35, 25);
 		printf("3.退出游戏");
-
 		gotoxy(29, 27);
 		printf("请选择[1,2,3]:[ ]\b\b");
-		scanf_s("%d", &n);
+		char ch;
+		ch = getchar();
+		int p = 1;
+		if (p) {
+			
+			if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {//判断是不是字母
+
+				printf("字母,重新输入！\n");
+				welcome();
+			}
+
+			else if (ch >= '0' && ch <= '9')//判断是不是数字
+
+			{
+				n = chartonumber(ch);
+				p = 0;
+			}
+			else {
+				welcome();
+			}
+			
+		}
+
+
+	
+			
+
+
 		switch (n) {
 		case 1:
 			/*
@@ -438,14 +464,14 @@ void welcome() {
 
 		case 3:
 			exit(0);
-			break;
+			break;	
 		default:
 			gotoxy(30, 30);
 			printf("输入数据不符合条件");
 			gotoxy(35, 35);
 			printf("	输入任意键退出!   ");
 			if (_getch()) {
-				system("cls");
+				system("cls");	
 				break;
 			}
 		}
@@ -519,6 +545,10 @@ void rePlay(int mod) {
 
 
 }
+
+
+
+
 /**
 提示WRONG
 */
